@@ -1,31 +1,51 @@
 package com.company;
 
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class Main {
 
     private static double[][] table = null;
     private static int n=1, m = 1;
+    private static boolean max = false;
 
     public static void main(String[] args) {
-        /*System.out.println("Input n and m");
-        Scanner line = new Scanner(System.in);
-        n = line.nextInt();
-        m = line.nextInt();
-        table = new double[n][m];
-        */
         autoTest();
+        transform();
         solve(false);
+        System.out.println(Arrays.deepToString(table));
     }
 
     static void autoTest(){
-        n=4;m=6;
-        table = new double[][]{ {9,2,1,1,0,0},
-                                {7,1,2,0,1,0},
-                                {5,1,1,0,0,1},
-                                {12,2,3,0,0,0}
+        n=3;
+        m=3;
+        max = false;
+        table = new double[][]{ {2,1,-2,0},    //{2,1,-2,0,0,0,0},
+                                {1,1,-1,8},    //{1,1,-1,-1,0,0,8},
+                                {1,-1,2,2},    //{1,-1,2,0,-1,0,2},
+                                {-2,-8,3,1}    //{-2,-8,3,0,0,-1,1}
         };
+    }
+
+    static void transform(){
+            double[][] buf = table;
+            table = new double[m+1][n+m+1];
+            for(int i =0;i<m+1;i++){
+                for(int j=0;j<n+m+1;j++){
+                    if(j>=n&&j<n+m){
+                        if(i==0)
+                            table[i][j] = 0;
+                        if(i==j-n+1)
+                            table[i][j] = max?1:-1;
+                        else
+                            table[i][j] = 0;
+                    }
+                    else if(j==n+m){
+                        table[i][j] = buf[i][j-n];
+                    }
+                    else
+                        table[i][j] = buf[i][j];
+                }
+            }
     }
 
     public static void solve(boolean isMax){
@@ -84,11 +104,11 @@ public class Main {
     }
 
     public static int findY(int x){
-        double min = table[0][0]/table[0][x];
+        double min = Double.MAX_VALUE;
         int num = 0;
         for(int i = 0;i<n-1;i++){
             double value = table[i][0]/table[i][x];
-            if(value <= min && value >=0){
+            if(value <= min && value >= 0){
                 min = value;
                 num = i;
             }
@@ -96,22 +116,20 @@ public class Main {
         return num;
     }
 
-    public static void resolve(int y, int x){
+    public static void resolve(int x, int y){
         for(int i = 0; i < n;i++){
             for(int j = 0;  j < m; j++){
-                if(i == x || j == y)
+                if(i == y || j == x)
                     continue;
-                table[i][j] -= table[x][j] * table[i][y] / table[x][y];
+                table[i][j] -= table[y][j] * table[i][x] / table[y][x];
             }
         }
         for(int i = 0;i<m;i++){
-            if(i!=y)table[x][i] /= table[x][y];
+            if(i!=x)table[y][i] /= table[y][x];
         }
         for(int i = 0;i<n;i++){
-            if(i==x) table[i][y] = 1;
-            else table[i][y] = 0;
+            if(i==y) table[i][x] = 1;
+            else table[i][x] = 0;
         }
     }
-
-
 }
