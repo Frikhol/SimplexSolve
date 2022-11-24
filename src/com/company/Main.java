@@ -2,50 +2,82 @@ package com.company;
 
 import java.util.Arrays;
 
+enum baseStr{
+
+}
+
 public class Main {
 
-    private static double[][] table = null;
-    private static int n=1, m = 1;
-    private static boolean max = false;
+    private static double[] func = null; // x1 x2 ... xn b
+    private static double[][] res = null;   // ограничения формата x1 x2 ... xn b1
+                                            //                     x1 x2 ... xn b2 итд
+    private static double[][] table = null; // Симплекс таблица
+    private static int n=0, m = 0, d = 0;   //n - кол-во переменных в исх функции,
+                                            //m - кол-во ограничений
+                                            //d - кол-во дополнительных базовых переменных в ограничениях
+    private static boolean isMax = false; // f->max?
+
+
 
     public static void main(String[] args) {
-        autoTest();
+        autoInput();
         transform();
-        solve(false);
-        System.out.println(Arrays.deepToString(table));
+        createTable();
+        System.out.println(Arrays.deepToString(res));
     }
 
-    static void autoTest(){
-        n=3;
-        m=3;
-        max = false;
-        table = new double[][]{ {2,1,-2,0},    //{2,1,-2,0,0,0,0},
-                                {1,1,-1,8},    //{1,1,-1,-1,0,0,8},
-                                {1,-1,2,2},    //{1,-1,2,0,-1,0,2},
-                                {-2,-8,3,1}    //{-2,-8,3,0,0,-1,1}
-        };
+    static void autoInput(){
+        n=3; m=2;
+        isMax = true;
+        func = new double[] {3,4,6,0};
+        res = new double[][]{   {2,5,2,12},    //{2,1,-2,0,0,0,0},
+                                {7,1,2,18}};    //{1,1,-1,-1,0,0,8},
     }
 
-    static void transform(){
-            double[][] buf = table;
-            table = new double[m+1][n+m+1];
-            for(int i =0;i<m+1;i++){
-                for(int j=0;j<n+m+1;j++){
-                    if(j>=n&&j<n+m){
-                        if(i==0)
-                            table[i][j] = 0;
-                        if(i==j-n+1)
-                            table[i][j] = max?1:-1;
-                        else
-                            table[i][j] = 0;
+    static void transform() {
+        boolean hasBase = false;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n+d; j++) {
+                if (res[i][j] == 1) {
+                    hasBase = isBase(i, j);
+                    if(hasBase){
+                        //resolveFunc(j);
                     }
-                    else if(j==n+m){
-                        table[i][j] = buf[i][j-n];
-                    }
-                    else
-                        table[i][j] = buf[i][j];
                 }
             }
+            if (!hasBase)
+                addBase(i);
+            hasBase = false;
+        }
+    }
+
+    static void resolveFunc(int num){
+        for(int i = 0;i<n-d;i++){
+        }
+    }
+
+    static void addBase(int num){
+        double[][] buf = res;
+        res = new double[m][n+1+d+1];
+        for(int i=0;i<m;i++){
+            for(int j=0;j<n+d;j++)
+                res[i][j] = buf[i][j];
+            res[i][n+1+d] = buf[i][n+1+d-1];
+            res[i][n+1+d-1] = i!=num?0:(isMax?1:-1);
+        }
+        d++;
+    }
+
+    static boolean isBase(int y,int x){
+        for(int i = 0;i<m;i++){
+            if(i!=y&&res[i][x]!=0)
+                return false;
+        }
+        return true;
+    }
+
+    static void createTable(){
+
     }
 
     public static void solve(boolean isMax){
