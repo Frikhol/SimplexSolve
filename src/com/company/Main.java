@@ -22,15 +22,20 @@ public class Main {
         autoInput();
         transform();
         createTable();
-        System.out.println(Arrays.deepToString(res));
+        printMatr();
+        //autoTest();
+        //System.out.println(Arrays.deepToString(res));
+        //System.out.println(Arrays.toString(func));
+        solve(isMax);
     }
 
     static void autoInput(){
-        n=3; m=2;
+        n=5; m=3;
         isMax = true;
-        func = new double[] {3,4,6,0};
-        res = new double[][]{   {2,5,2,12},    //{2,1,-2,0,0,0,0},
-                {7,1,2,18}};    //{1,1,-1,-1,0,0,8},
+        func = new double[] {-3,1,4,0,0,0};
+        res = new double[][]{   {0,-1,1,1,0,1},    //{2,5,2,1,0,12},
+                                {-5,1,1,0,0,2},
+                                {-8,1,2,0,-1,3}};    //{7,1,2,0,1,18},
     }
 
     static void transform() {
@@ -40,7 +45,7 @@ public class Main {
                 if (res[i][j] == 1) {
                     hasBase = isBase(i, j);
                     if(hasBase){
-                        //resolveFunc(j);
+                        resolveFunc(i,j);
                     }
                 }
             }
@@ -55,20 +60,27 @@ public class Main {
 
             if (i==col)
                 continue;
-            func[i] +=res[row][i] * func[col] ;
+            func[i] -= res[row][i] * func[col] ;
         }
+        func[func.length-1] += func[col]*res[row][res[0].length-1];
         func[col] = 0;
     }
 
     static void addBase(int num){
         double[][] buf = res;
+        double[] vec = func;
         res = new double[m][n+1+d+1];
+        func = new double[n+1+d+1];
         for(int i=0;i<m;i++){
             for(int j=0;j<n+d;j++)
                 res[i][j] = buf[i][j];
             res[i][n+1+d] = buf[i][n+1+d-1];
             res[i][n+1+d-1] = i!=num?0:(isMax?1:-1);
         }
+        for(int i =0;i<n+d;i++) //n+d+1
+            func[i]=vec[i];
+        func[n+d]=0;
+        func[n+d+1]=vec[n+d];
         d++;
     }
 
@@ -81,15 +93,18 @@ public class Main {
     }
 
     static void createTable(){
-
+        int per = n;                     //{2,5,2,1,0,12},
+        int ogr = m;                     //{7,1,2,0,1,18},
+        n = ogr+1;
+        m = per+d+1;
+        table = new double[n][m];
+        for(int i = 0;i<n-1;i++)
+            for(int j = 0;j<m;j++)
+                table[i][(j+1)%m] = res[i][j];
+        for(int i = 0;i<m;i++)
+            table[n-1][(i+1)%m] = (i+1)%m==0?func[i]:-func[i];
     }
 
-    //public static void main(String[] args) {
-//
-    //    //autoTest();
-    //    input();
-    //    solve(true);
-    //}
     static void input(){
         Scanner sc = new Scanner(System.in);
         n=sc.nextInt();
@@ -103,24 +118,29 @@ public class Main {
         }
         System.out.println();
     }
+
     static void autoTest(){
-        n=4;m=6;
+        n=4;m=8;
+        isMax=true;
         table = new double[][]{
-                {9,2,1,1,0,0},
-                {7,1,2,0,1,0},
-                {5,1,1,0,0,1},
-                {12,2,3,0,0,0}
+                {1,0,-1,1,1,0,0,0},
+                {2,-5,1,1,0,0,1,0},
+                {3,-8,1,2,0,-1,0,1},
+                {0,3,-1,-4,0,0,0,0}
         };
     }
 
     public static void solve(boolean isMax){
         while(true){
+
             int x = findX(isMax);
 
             if(x==-1){
                 break;
             }
-            int y =findY(x);
+
+            int y = findY(x);
+
             printMatr(x,y);
 
             if (table[n - 1][x] == 0)
@@ -178,7 +198,7 @@ public class Main {
         for(int j = 1;j<m;j++){
             double value = table[n-1][j];
             if(value==0)continue;
-            if((isMax?value<=max:value>=max)) {
+            if((isMax?(value<=max&&value<0):(value>=max&&value>0))) {
                 max = value;
                 num = j;
             }
@@ -217,4 +237,3 @@ public class Main {
     }
 
 }
-
