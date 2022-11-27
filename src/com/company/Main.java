@@ -2,14 +2,12 @@ package com.company;
 
 import java.util.Arrays;
 
-enum baseStr{
 
-}
 
 public class Main {
 
     private static double[] func = null; // x1 x2 ... xn b
-    private static double[][] res = null;   // ограничения формата x1 x2 ... xn b1
+    private static double[][] res = null;  // ограничения формата x1 x2 ... xn b1
                                             //                     x1 x2 ... xn b2 итд
     private static double[][] table = null; // Симплекс таблица
     private static int n=0, m = 0, d = 0;   //n - кол-во переменных в исх функции,
@@ -23,7 +21,9 @@ public class Main {
         autoInput();
         transform();
         createTable();
+
         System.out.println(Arrays.deepToString(res));
+        System.out.println(Arrays.toString(func));
     }
 
     static void autoInput(){
@@ -41,7 +41,7 @@ public class Main {
                 if (res[i][j] == 1) {
                     hasBase = isBase(i, j);
                     if(hasBase){
-                        //resolveFunc(j);
+                        resolveFunc(i,j);
                     }
                 }
             }
@@ -51,9 +51,15 @@ public class Main {
         }
     }
 
-    static void resolveFunc(int num){
-        for(int i = 0;i<n-d;i++){
+    static void resolveFunc(int row,int col){
+
+        for(int i = 0;i<n+d;i++){
+
+           if (i==col)
+               continue;
+           func[i] +=res[row][i] * func[col] ;
         }
+        func[col] = 0;
     }
 
     static void addBase(int num){
@@ -164,4 +170,6 @@ public class Main {
             else table[i][x] = 0;
         }
     }
+
 }
+
