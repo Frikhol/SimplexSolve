@@ -136,12 +136,18 @@ public class Main {
             int x = findX(isMax);
 
             if(x==-1){
+                System.out.println("нет разрешающего столбца");
                 break;
             }
 
             int y = findY(x);
-
             printMatr(x,y);
+            if(y==-1){
+                System.out.println("все симплекс оценки отрицательные, нет решения");
+                break;
+            }
+
+
 
             if (table[n - 1][x] == 0)
                 break;
@@ -152,7 +158,7 @@ public class Main {
         }
         printMatr();
 
-        System.out.println("нет разрешающего столбца");
+
         double[] result = new double[m-1];
         for (int i=1;i<m;i++){
             int zero = 0;
